@@ -27,7 +27,6 @@ export async function api<T>(path: string, opts: RequestInit = {}, token?: strin
   }
   const ct = res.headers.get('content-type') || ''
   if (ct.includes('application/json')) return res.json() as Promise<T>
-  // @ts-ignore
   return res.text() as Promise<T>
 }
 
@@ -56,10 +55,32 @@ export async function getBook(id: string, token: string) {
   return api<any>(`/books/${id}`, {}, token)
 }
 
-export async function createBook(data: any, token: string) {
-  return api<any>('/books', { method: 'POST', body: JSON.stringify(data) }, token)
+export async function createBook(data: FormData, token: string) {
+  const res = await fetch('/books', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: data
+  })
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`)
+  }
+  return res.json()
 }
 
-export async function updateBook(id: string, data: any, token: string) {
-  return api<any>(`/books/${id}`, { method: 'PATCH', body: JSON.stringify(data) }, token)
+export async function updateBook(id: string, data: FormData, token: string) {
+  const res = await fetch(`/books/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: data
+  })
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`)
+  }
+  return res.json()
 }

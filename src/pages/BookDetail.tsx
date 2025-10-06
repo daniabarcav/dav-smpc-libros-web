@@ -39,7 +39,17 @@ export default function BookDetail() {
             </Stack>
           </Grid>
           <Grid item xs={12} md={4}>
-            {book.coverUrl && <img src={book.coverUrl} alt="cover" style={{ width: '100%', borderRadius: 8 }} />}
+            {book.coverUrl && (
+              <img 
+                src={`http://localhost:3000${book.coverUrl}`} 
+                alt="cover" 
+                style={{ width: '100%', borderRadius: 8 }} 
+                onError={(e) => {
+                  console.error('Error cargando imagen:', book.coverUrl);
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
           </Grid>
         </Grid>
       </CardContent>

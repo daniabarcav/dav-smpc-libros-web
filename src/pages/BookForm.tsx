@@ -16,7 +16,6 @@ const schema = z.object({
   available: z.boolean().default(true),
   year: z.coerce.number().int().min(0, '>= 0'),
   price: z.coerce.number().min(0, '>= 0'),
-  coverUrl: z.string().url().optional()
 })
 type FormData = z.infer<typeof schema>
 
@@ -43,21 +42,29 @@ export default function BookForm() {
     })()
   }, [isEdit, token, id, reset])
 
-  async function toBase64(file: File): Promise<string> {
-    return new Promise((res, rej) => {
-      const r = new FileReader()
-      r.onerror = () => rej(new Error('read error'))
-      r.onload = () => res(String(r.result))
-      r.readAsDataURL(file)
-    })
-  }
-
   const onSubmit = handleSubmit(async (data) => {
-    const file = fileRef.current?.files?.[0]
-    if (file) data.coverUrl = await toBase64(file)
     if (!token) throw new Error('No token')
-    if (isEdit && id) await updateBook(id, data, token)
-    else await createBook(data, token)
+    
+    const formData = new FormData()
+    
+    formData.append('title', data.title)
+    formData.append('author', data.author)
+    if (data.publisher) formData.append('publisher', data.publisher)
+    if (data.genre) formData.append('genre', data.genre)
+    formData.append('available', String(data.available))
+    formData.append('year', String(data.year))
+    formData.append('price', String(data.price))
+    
+    const file = fileRef.current?.files?.[0]
+    if (file) {
+      formData.append('cover', file)
+    }
+    
+    if (isEdit && id) {
+      await updateBook(id, formData, token)
+    } else {
+      await createBook(formData, token)
+    }
     nav('/books')
   })
 
