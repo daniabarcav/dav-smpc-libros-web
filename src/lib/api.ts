@@ -70,6 +70,34 @@ export async function createBook(data: FormData, token: string) {
   return res.json()
 }
 
+export async function deleteBook(id: string, token: string) {
+  const res = await fetch(`/books/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`)
+  }
+  return res.json()
+}
+
+export async function restoreBook(id: string, token: string) {
+  const res = await fetch(`/books/${id}/restore`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`)
+  }
+  return res.json()
+}
+
 export async function updateBook(id: string, data: FormData, token: string) {
   const res = await fetch(`/books/${id}`, {
     method: 'PATCH',
@@ -83,4 +111,6 @@ export async function updateBook(id: string, data: FormData, token: string) {
     throw new Error(`HTTP ${res.status}: ${text || res.statusText}`)
   }
   return res.json()
+
+  
 }
